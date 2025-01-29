@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-
+import './App.css'
 const Design = () => {
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState("");

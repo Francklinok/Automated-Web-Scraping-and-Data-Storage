@@ -1,38 +1,31 @@
-import  mongoose from'mongoose'
+
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const dataModel = new Schema({
-    user:{
-        type:String, 
-        required:true,
-        maxlength:50
+    reposName: {
+        type: String,
+        required: true,
+        maxlength: 100
     },
-    reposName:{
-        type:String,
-         required:true,
-         maxlength:100
-
-        },
-    reposStart:{
-        type:Number,
-        min:0
+    reposStar: { // Corrigé ici
+        type: Number,
+        min: 0
     },
-    reposDescription:{
-        type:String,
-        maxlenght:500
-       
+    reposDescription: {
+        type: String,
+        maxlength: 500 // Corrigé ici
     },
-    reposUrl:{
-        type:String,
-        required:true,
+    reposUrl: {
+        type: String,
+        required: true,
         match: /https?:\/\/(www\.)?github\.com\/.+/
-        },
+    },
+    tags: {
+        type: [String],
+        default: []
+    }
+}, { timestamps: true }); // Correction ici
 
-    tags:{
-        type:[String],
-         default:[]
-        }
-}, {timeStamp:true});
-
-const Repos  = mongoose.model('Repositories',dataModel)
-export  default Repos;
+const Repos = mongoose.model('Repositories', dataModel);
+export default Repos;

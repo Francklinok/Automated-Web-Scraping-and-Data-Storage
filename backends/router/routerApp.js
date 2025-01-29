@@ -10,4 +10,4 @@ router.put('/repositories/:id', repos.updatedRepos)
 router.delete('/repositories/:id', repos.deletRepos)
 
 
-export default router;
+export default router; 

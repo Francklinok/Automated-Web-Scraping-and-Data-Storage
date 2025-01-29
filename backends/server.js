@@ -13,7 +13,7 @@ console.log("🔍 dbURL:", process.env.MONGO_URL);
 
 mongoose
 .connect(process.env.dbURL, {
-    useNewUrlParser:true,
+    // useNewUrlParser:true,
     // useUnifiedTopology:true,
     // useFindAndModify:false,
      
