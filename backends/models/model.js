@@ -1,4 +1,11 @@
+Topic: repo.topicName,
+          RepoName: repo.repoName,
+          RepoUrl: repo.repoUrl,
+          Stars: repo.repoStars,
+          Description: repo.repoDescription,
+          Tags: repo.tags.join(', '),
 
+          
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
