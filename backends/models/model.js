@@ -1,38 +1,41 @@
-Topic: repo.topicName,
-          RepoName: repo.repoName,
-          RepoUrl: repo.repoUrl,
-          Stars: repo.repoStars,
-          Description: repo.repoDescription,
-          Tags: repo.tags.join(', '),
-
-          
 import mongoose from 'mongoose';
+
 const Schema = mongoose.Schema;
 
-const dataModel = new Schema({
-    reposName: {
+const repoSchema = new Schema({
+    Topic: {
         type: String,
         required: true,
         maxlength: 100
     },
-    reposStar: { // Corrigé ici
-        type: Number,
-        min: 0
-    },
-    reposDescription: {
+    TopicDescription: {
         type: String,
-        maxlength: 500 // Corrigé ici
+        maxlength: 500
     },
-    reposUrl: {
+    RepoName: {
         type: String,
         required: true,
-        match: /https?:\/\/(www\.)?github\.com\/.+/
+        maxlength: 100
     },
-    tags: {
+    RepoUrl: {
+        type: String,
+        required: true,
+        match: /^https?:\/\/(www\.)?github\.com\/.+/
+    },
+    Stars: {
+        type: Number,
+        min: 0,
+        default: 0
+    },
+    Description: {
+        type: String,
+        maxlength: 1000
+    },
+    Tags: {
         type: [String],
         default: []
     }
-}, { timestamps: true }); // Correction ici
+}, { timestamps: true });
 
-const Repos = mongoose.model('Repositories', dataModel);
-export default Repos;
+const Repository = mongoose.model('Repository', repoSchema);
+export default Repository;

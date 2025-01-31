@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import './App.css'
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import FindAllTable  from "./component/table"
 
-const socket = io("http://localhost:3000");
+// const socket = io("http://localhost:3000");
 
 const Design = () => {
   const [data, setData] = useState([]);
@@ -13,54 +13,81 @@ const Design = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   // fetch data from mongodb;
-  useEffect(() => {
-    async function fetchData() {
-      // setLoading(true)
-      const respond = await axios.get("http://localhost:3000/api/data");
-      setData(respond.data || "nothing find");
+  
+  const handleFetchRepositories = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:3000/api/data");
+      setData(response.data);  // Mettre à jour les données avec la réponse
+      alert("Données récupérées avec succès");
+    } catch (error) {
+      alert("Error: " + error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-
-    fetchData();
-
-    socket.on("updateData", (newData) =>{
-      setData(newData);
-    })
-    return ( ) =>{
-      socket.off("updateData");
+  };
+  const handleFetchRepositoryById = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`http://localhost:3000/api/data/${id}`);
+      // Traitement de la réponse pour afficher ou manipuler les données récupérées
+      alert("Données du repository récupérées avec succès");
+    } catch (error) {
+      alert("Error: " + error.message);
+    } finally {
+      setLoading(false);
     }
-  }, []);
-
+  };
+  const handleUpdateRepository = async (id, updatedData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(`http://localhost:3000/api/data/${id}`, updatedData);
+      // Mettre à jour l'élément dans le tableau des données locales
+      setData(data.map(item => item._id === id ? response.data : item));
+      alert("Repository mis à jour avec succès");
+    } catch (error) {
+      alert("Error: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
   // handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
+    try {
       setLoading(true);
-      const  response = await axios.post("http://localhost:3000/api/data", formData);
-      setData([...data, response.data])
+      const response = await axios.post("http://localhost:3000/api/data", formData);
+      setData([...data, response.data]);
       setFormData({});
       alert("Data added successfully");
-    }catch(error){
-      alert(error)
+    } catch (error) {
+      alert("Error: " + error.message);
+    } finally {
+      setLoading(false);
     }
-  setLoading(false);
   };
-
-  const handleDelete = (id) =>{
-    try{
-      setLoading(true)
-      axios.delete("https://localhost :3000/api/data/ ${id}" );
-      setData(data.filter(item => item._id !== id)) 
-    }catch(error){
-      console.log(error)
+  
+  const handleDelete = async (id) => {
+    try {
+      setLoading(true);
+      await axios.delete(`http://localhost:3000/api/data/${id}`); // Corriger l'URL avec backticks
+      setData(data.filter(item => item._id !== id));
+    } catch (error) {
+      console.log("Error during delete: ", error);
+    } finally {
+      setLoading(false); // Assure que setLoading est toujours exécuté
     }
-   setLoading(false)
-  }
-  const handleOpen = () =>{
-    setIsOpen(true)
-  }
- 
-
+  };
+  
+  const handleOpen = () => {
+    handleFetchRepositories();
+    setIsOpen(true);
+  };
+ const handleClose = () =>{
+  setIsOpen(false)
+ }
   return (
     <div className="flex flex-column bg-gray-900 text-white min-h-screen flex justify-center items-center p-6 pl-10">
       <div className="w-full max-w-4xl">
@@ -136,19 +163,24 @@ const Design = () => {
             <button
                 type="FindAll"
                 onClick = {handleOpen}
-                className="p-3 bg-red-400 place-content-center rounded-lg text-white font-bold hover:bg-red-600 transition"
+                className="p-3 bg-cyan-700 place-content-center rounded-lg text-white font-bold hover:bg-cyan-900 transition"
               >
                 FindAll
             </button>
+            <button
+                type="FindAll"
+                onClick = {handleOpen}
+                className="p-3 ml-4 bg-red-400 place-content-center rounded-lg text-white font-bold hover:bg-red-600 transition"
+              >
+                Delete
+            </button>
           
           </div> 
-          {/* {isOpen && <FindAllTable 
-                 topicName = {topicName}
-                 topicDescription = {topicDescription}
-                 repositories  = {data}
-                 enclose = {() =>  setIsOpen(false)}
+          {isOpen && <FindAllTable 
+                 data  = {data}
+                 enclose = {handleClose}
                  />
-          } */}
+          }
         </main>
       </div>
       

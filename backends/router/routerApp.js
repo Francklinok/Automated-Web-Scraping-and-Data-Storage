@@ -4,10 +4,10 @@ const router = express.Router()
 import  repos from '../controlle/controlle.js'
 
 router.post('/repositories', repos.addRepository)
-router.get('/repositories', repos.getAllRepository )
-router.get('/repositories/:id', repos.findReposById )
-router.put('/repositories/:id', repos.updatedRepos)
-router.delete('/repositories/:id', repos.deletRepos)
+router.get('/repositories', repos.getAllRepositories )
+router.get('/repositories/:id', repos.getRepositoryById)
+router.put('/repositories/:id', repos.updateRepository)
+router.delete('/repositories/:id', repos.deleteRepository)
 
 
 export default router; 
