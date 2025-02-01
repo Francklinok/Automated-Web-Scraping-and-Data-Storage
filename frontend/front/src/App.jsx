@@ -8,43 +8,73 @@ import FindAllTable  from "./component/table"
 
 const Design = () => {
   const [data, setData] = useState([]);
+  const [filterData, setFilterData] = useState([]);
+
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false);
 
+  console.log('data',data)
   // fetch data from mongodb;
   
   const handleFetchRepositories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:3000/api/data");
+      const response = await axios.get("http://localhost:3000/api/repositories");
       setData(response.data);  // Mettre à jour les données avec la réponse
-      alert("Données récupérées avec succès");
+      console.log("Données récupérées avec succès");
     } catch (error) {
       alert("Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
-  const handleFetchRepositoryById = async (id) => {
+
+  const handleFetchRepositoryByName = async (name) => {
+    if (!name) {
+      console.log('Veuillez entrer un nom de repository');
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:3000/api/data/${id}`);
+      const response = await axios.get(`http://localhost:3000/api/repository?repoName=${name}`);
+      setFilterData(response.data);
+      console.log("Données du repository récupérées avec succès",response.data);
+    } catch (error) {
+      alert("Erreur : " + error.message); 
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
+  const handleFetchRepositoryById = async (id) => {
+    if(!id){
+      console.log('veillez entrer un  nom de repositories');
+      return ;
+    }
+    try {
+      setLoading(true);
+      const response = await axios.delete(`http://localhost:3000/api/data/${id}`);
+      setData(response.data);  // Mettre à jour les données avec la réponse
       // Traitement de la réponse pour afficher ou manipuler les données récupérées
-      alert("Données du repository récupérées avec succès");
+      console.log("Données du repository récupérées avec succès");
     } catch (error) {
       alert("Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
+
   const handleUpdateRepository = async (id, updatedData) => {
     try {
       setLoading(true);
       const response = await axios.put(`http://localhost:3000/api/data/${id}`, updatedData);
       // Mettre à jour l'élément dans le tableau des données locales
       setData(data.map(item => item._id === id ? response.data : item));
-      alert("Repository mis à jour avec succès");
+      console.log("Repository mis à jour avec succès");
     } catch (error) {
       alert("Error: " + error.message);
     } finally {
@@ -61,25 +91,43 @@ const Design = () => {
       const response = await axios.post("http://localhost:3000/api/data", formData);
       setData([...data, response.data]);
       setFormData({});
-      alert("Data added successfully");
+      console.log("Data added successfully");
     } catch (error) {
       alert("Error: " + error.message);
     } finally {
       setLoading(false);
     }
   };
-  
-  const handleDelete = async (id) => {
+
+  // const handleDeleteRepository= async (id) => {
+  //   try {
+  //     setLoading(true);
+  //     await axios.delete(`http://localhost:3000/api/data/${id}`); // Corriger l'URL avec backticks
+  //             setFilterData(prevData => prevData.filter(item => item.id !== id));
+
+  //     console.log('succesfully deleted filterDta :', filterData)
+
+  //   } catch (error) {
+  //     console.log("Error during delete: ", error);
+  //   } finally {
+  //     setLoading(false); // Assure que setLoading est toujours exécuté
+  //   }
+  // };
+  const handleDeleteRepository = async (id) => {
     try {
-      setLoading(true);
-      await axios.delete(`http://localhost:3000/api/data/${id}`); // Corriger l'URL avec backticks
-      setData(data.filter(item => item._id !== id));
+        setLoading(true);
+        await axios.delete(`http://localhost:3000/api/repositories/${id}`);
+        setFilterData(filterData);
+
+        // Filtrer le repository supprimé de la liste
+        console.log('Successfully deleted filterData: ', filterData);
     } catch (error) {
-      console.log("Error during delete: ", error);
+        console.log("Error during delete: ", error);
     } finally {
-      setLoading(false); // Assure que setLoading est toujours exécuté
+        setLoading(false); 
     }
-  };
+};
+
   
   const handleOpen = () => {
     handleFetchRepositories();
@@ -88,8 +136,11 @@ const Design = () => {
  const handleClose = () =>{
   setIsOpen(false)
  }
+ const handleDelete = () =>{
+  handleDeleteRepository(filterData._id)
+}
   return (
-    <div className="flex flex-column bg-gray-900 text-white min-h-screen flex justify-center items-center p-6 pl-10">
+    <div className="relative flex flex-column bg-gray-900 text-white min-h-screen flex justify-center items-center p-6 pl-10">
       <div className="w-full max-w-4xl">
         {/* Header */}
         <header className="flex justify-between items-center p-4 bg-gray-800 rounded-xl shadow-md">
@@ -106,21 +157,26 @@ const Design = () => {
         </header>
 
         {/* Main Dashboard */}
-        <main className="">
+        <main>
           {/* Data List */}
-          <div className = "mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="p-2 bg-gray-800 rounded-xl shadow-md">
-            <h2 className="text-xl font-semibold text-purple-400 text-center pt-0 mt-0">Data</h2>
+          <div className = "mt-8 rounded-x1 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="p-2 bg-gray-800  shadow-md">
+            <h2 className="text-xl font-semibold text-purple-400 text-center pt-0 mt-0"></h2>
             <div className="mt-4 space-y-4 max-h-96 overflow-y-auto">
-              {data.map((item) => (
+            {filterData ? (
                 <div
-                  key={item._id}
-                  className="p-4 bg-gray-700 rounded-lg shadow hover:bg-gray-600 transition"
+                key={filterData._id}
+                className="p-4  rounded-lg shadow  transition"
                 >
-                  <h3 className="text-lg font-semibold text-cyan-300">{item.name}</h3>
-                  <p>{item.description}</p>
+                  <h3 className="text-lg rounded-xl mb-2 bg-gray-700 p-2 font-semibold text-gray-300">Topic :{filterData.Topic}</h3>
+                  <p className="text-lg rounded-xl mb-2 bg-gray-700 p-2 font-semibold text-gray-300">Topic-Des: {filterData.TopicDescription}</p>
+                  <p className="text-lg rounded-xl mb-2 hover:bg-gray-600 bg-gray-700 p-2 font-semibold text-gray-300" >Repo: <a href={filterData.RepoUrl}>{filterData.RepoName}</a></p>
+                  <p className="text-lg rounded-xl mb-2 bg-gray-700 p-2 font-semibold text-gray-300">Stars: {filterData.Stars}</p>
+                  <p className="text-lg rounded-xl mb-2 bg-gray-700 p-2 font-semibold text-gray-300">Description: {filterData.Description}</p>
                 </div>
-              ))}
+              ):""}
+
+             
             </div>
           </div>
 
@@ -128,13 +184,18 @@ const Design = () => {
           <div className="p-6 bg-gray-800 rounded-xl shadow-md">
             <h2 className="text-xl font-semibold text-green-400">Search Data</h2>
             <form
-              onSubmit={handleSubmit}
+             onSubmit={(e) =>{
+                e.preventDefault();
+                handleFetchRepositoryByName(formData.name)
+              }
+              }
               className="mt-4 flex flex-col space-y-4"
             >
+          
               <input
                 type="text"
-                placeholder="reposName"
-                value={formData.name}
+                placeholder="repos Name"
+                value={formData.name || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
@@ -142,7 +203,7 @@ const Design = () => {
                 required
               />
               <textarea
-                placeholder="Description"
+                placeholder="Description 'optional'"
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
@@ -168,19 +229,27 @@ const Design = () => {
                 FindAll
             </button>
             <button
-                type="FindAll"
-                onClick = {handleOpen}
+                type="delete"
+                onClick = {handleDelete}
                 className="p-3 ml-4 bg-red-400 place-content-center rounded-lg text-white font-bold hover:bg-red-600 transition"
               >
                 Delete
             </button>
           
           </div> 
-          {isOpen && <FindAllTable 
-                 data  = {data}
-                 enclose = {handleClose}
-                 />
-          }
+
+          {isOpen && (
+              <div className="absolute inset-0 bg-gray-800 bg-opacity-50 z-80 " >
+            {/* // <div className="absolute inset-0 bg-gray-900 bg-opacity-75 z-50 flex justify-center items-center"> */}
+
+              <FindAllTable 
+                  className="absolute p-2 z-1000"
+                  data  = {data}
+                  onClose = {handleClose}
+                  />
+              </div>
+               )}
+          
         </main>
       </div>
       
