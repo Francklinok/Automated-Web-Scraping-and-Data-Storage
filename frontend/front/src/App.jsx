@@ -5,7 +5,6 @@ import './App.css'
 import FindAllTable  from "./component/table"
 
 // const socket = io("http://localhost:3000");
-
 const Design = () => {
   const [data, setData] = useState([]);
   const [filterData, setFilterData] = useState([]);
@@ -29,7 +28,7 @@ const Design = () => {
       setLoading(false);
     }
   };
-
+// fetch repository by name
   const handleFetchRepositoryByName = async (name) => {
     if (!name) {
       console.log('Veuillez entrer un nom de repository');
@@ -49,7 +48,7 @@ const Design = () => {
   };
   
   
-
+// fetch repository by id
   const handleFetchRepositoryById = async (id) => {
     if(!id){
       console.log('veillez entrer un  nom de repositories');
@@ -58,8 +57,7 @@ const Design = () => {
     try {
       setLoading(true);
       const response = await axios.delete(`http://localhost:3000/api/data/${id}`);
-      setData(response.data);  // Mettre à jour les données avec la réponse
-      // Traitement de la réponse pour afficher ou manipuler les données récupérées
+      setData(response.data);  
       console.log("Données du repository récupérées avec succès");
     } catch (error) {
       alert("Error: " + error.message);
@@ -68,11 +66,11 @@ const Design = () => {
     }
   };
 
+  //update repository 
   const handleUpdateRepository = async (id, updatedData) => {
     try {
       setLoading(true);
       const response = await axios.put(`http://localhost:3000/api/data/${id}`, updatedData);
-      // Mettre à jour l'élément dans le tableau des données locales
       setData(data.map(item => item._id === id ? response.data : item));
       console.log("Repository mis à jour avec succès");
     } catch (error) {
@@ -99,27 +97,11 @@ const Design = () => {
     }
   };
 
-  // const handleDeleteRepository= async (id) => {
-  //   try {
-  //     setLoading(true);
-  //     await axios.delete(`http://localhost:3000/api/data/${id}`); // Corriger l'URL avec backticks
-  //             setFilterData(prevData => prevData.filter(item => item.id !== id));
-
-  //     console.log('succesfully deleted filterDta :', filterData)
-
-  //   } catch (error) {
-  //     console.log("Error during delete: ", error);
-  //   } finally {
-  //     setLoading(false); // Assure que setLoading est toujours exécuté
-  //   }
-  // };
   const handleDeleteRepository = async (id) => {
     try {
         setLoading(true);
         await axios.delete(`http://localhost:3000/api/repositories/${id}`);
         setFilterData(filterData);
-
-        // Filtrer le repository supprimé de la liste
         console.log('Successfully deleted filterData: ', filterData);
     } catch (error) {
         console.log("Error during delete: ", error);

@@ -1,16 +1,21 @@
 import PropTypes from 'prop-types';
 import React from "react"
+
+// This component is responsible for displaying a table of repositories grouped by topic.
 const FindAllTable = ({ onClose, data }) => {
-  // Regrouper les repos par topic
+
+  // Grouping the repositories by their respective topic
   const groupedData = new Map();
 
   data.forEach((repo) => {
+        // If the topic doesn't exist in the map, we create it with an empty array for repositories.
     if (!groupedData.has(repo.Topic)) {
       groupedData.set(repo.Topic, {
         topicDescription: repo.TopicDescription,
-        repos: [],
+        repos: [],// Initialize an empty array for repositories under this topic.
       });
     }
+        // Adding the repository to the appropriate topic group.
     groupedData.get(repo.Topic).repos.push(repo);
   });
 
